@@ -1,57 +1,56 @@
 const { Bot } = require("grammy");
-const cron = require("node-cron")
-const token = require("./config.js")
+const { token } = require("./config");
 
+// Экземпляр бота
 const bot = new Bot(token);
 
-const users = {}
+// Объект для хранения данных пользователей
+const users = {};
 
-
+// Команда /start
 bot.command("start", (ctx) => {
   ctx.reply("Добро пожаловать. Запущен и работает!");
 });
 
-
-
-// сообщения
+// Обработка сообщений
 bot.on("message", (ctx) => {
   const text = ctx.message.text;
-
   if (!text) {
     return ctx.reply("Пожалуйста, напиши текстом сообщение: «Купила линзы»");
   }
 
+  const userId = ctx.from.id;
+
   if (text.toLowerCase().includes("купила линзы")) {
-    const userId = ctx.from.id; 
-    users[userId] = {date: new Date() , reminded : false}
+    users[userId] = { date: new Date(), reminded: false };
     return ctx.reply("Окей, записал. Напомню через 28 дней");
   }
 
-if (text.toLowerCase().includes("люблю тебя")) {
-  return ctx.reply("Олег тоже тебя очень сильно любит!");
-}
+  if (text.toLowerCase().includes("люблю тебя")) {
+    return ctx.reply("Олег : Я тоже тебя очень сильно любит!");
+  }
 
   ctx.reply("Сообщение получено, но я его пока не понимаю");
 });
 
+// Команда /check — проверка последней даты покупки
 bot.command("check", (ctx) => {
-  const userId = ctx.from.id;
-  const date = users[userId];
-  if (date) {
-    ctx.reply(`Твоя последняя покупка: ${date.toLocaleDateString()}`);
+  const user = users[ctx.from.id];
+  if (user) {
+    ctx.reply(`Твоя последняя покупка: ${user.date.toLocaleDateString()}`);
   } else {
     ctx.reply("Пока у меня нет информации о твоих покупках.");
   }
 });
 
+// Проверка напоминаний каждые 1 минуту (можно увеличить интервал)
 setInterval(() => {
   const now = new Date();
   for (const userId in users) {
     const user = users[userId];
     if (!user.reminded) {
-      const diff = now - user.date; //
-      const days = diff / (1000 * 60 * 60 * 24);
-      if (days >= 28) {
+      const diffDays = (now - new Date(user.date)) / (1000 * 60 * 60 * 24);
+      if (diffDays >= 28) {
         bot.api.sendMessage(userId, "Пора менять линзы!");
         user.reminded = true;
       }
@@ -59,8 +58,7 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
+// Старт бота
 bot.start({
-  onStart: () => {
-    console.log("Бот запущен");
-  },
+  onStart: () => console.log("Бот запущен"),
 });
