@@ -6,7 +6,7 @@ const bot = new Bot(token);
 
 const users = {}
 
-// /start
+
 bot.command("start", (ctx) => {
   ctx.reply("Добро пожаловать. Запущен и работает!");
 });
