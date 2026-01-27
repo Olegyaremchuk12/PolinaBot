@@ -43,7 +43,7 @@ bot.command("check", (ctx) => {
   }
 });
 
-// Проверка напоминаний каждые 1 минуту (можно увеличить интервал)
+
 setInterval(() => {
   const now = new Date();
   for (const userId in users) {
