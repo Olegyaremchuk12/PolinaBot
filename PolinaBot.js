@@ -33,7 +33,7 @@ bot.on("message", (ctx) => {
   }
 
   if (text === "Люблю тебя") {
-    return ctx.reply("Олег: Я тоже тебя очень сильно любит!", {
+    return ctx.reply("Олег тоже тебя очень сильно любит!", {
       reply_markup: mainKeyboard,
     });
   }
