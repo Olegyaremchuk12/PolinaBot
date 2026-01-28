@@ -26,7 +26,11 @@ bot.on("message", (ctx) => {
   const userId = ctx.from.id;
 
   if (text === "Купила линзы") {
-    users[userId] = { date: new Date(), reminded: false };
+    users[userId] = {
+      date: new Date(),
+      reminded: false,
+    };
+
     return ctx.reply("Окей, записал. Напомню через 28 дней", {
       reply_markup: mainKeyboard,
     });
@@ -38,13 +42,12 @@ bot.on("message", (ctx) => {
     });
   }
 
-  // Если что-то непонятное
   ctx.reply("Пожалуйста, используй кнопки ниже:", {
     reply_markup: mainKeyboard,
   });
 });
 
-// Команда /check — проверка последней даты покупки
+// Команда /check
 bot.command("check", (ctx) => {
   const user = users[ctx.from.id];
   if (user) {
@@ -54,13 +57,17 @@ bot.command("check", (ctx) => {
   }
 });
 
-// Напоминание через 28 дней
+// Напоминание через 28 дней (линзы)
 setInterval(() => {
   const now = new Date();
+
   for (const userId in users) {
     const user = users[userId];
+
     if (!user.reminded) {
-      const diffDays = (now - new Date(user.date)) / (1000 * 60 * 60 * 24);
+      const diffDays =
+        (now - new Date(user.date)) / (1000 * 60 * 60 * 24);
+
       if (diffDays >= 28) {
         bot.api.sendMessage(userId, "Пора менять линзы!");
         user.reminded = true;
@@ -68,6 +75,18 @@ setInterval(() => {
     }
   }
 }, 60 * 1000);
+
+// Напоминание раз в 4 дня (просто пока бот запущен)
+const FOUR_DAYS = 4 * 24 * 60 * 60 * 1000;
+
+setInterval(() => {
+  for (const userId in users) {
+    bot.api.sendMessage(
+      userId,
+      "Напоминание: купить вкусняшки Олегу!"
+    );
+  }
+}, FOUR_DAYS);
 
 // Старт бота
 bot.start({
